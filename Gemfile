@@ -22,6 +22,14 @@ gem "jbuilder"
 # Use Kredis to get higher-level data types in Redis [https://github.com/rails/kredis]
 # gem "kredis"
 
+#--------[GEMAS EXCEL]------
+
+gem "roo", "2.10.1"
+gem "activerecord-import", "2.0.0"
+
+gem "caxlsx", "4.2.0"
+gem "caxlsx_rails", "0.6.4"
+
 # Use Active Model has_secure_password [https://guides.rubyonrails.org/active_model_basics.html#securepassword]
 # gem "bcrypt", "~> 3.1.7"
 
