@@ -4,6 +4,8 @@
 
 <h1>Carros</h1>
 
+<%= link_to "Descarga Template", carros_path(format: "xlsx") %>
+
 <div id="carros">
   <% @carros.each do |carro| %>
     <%= render carro %>

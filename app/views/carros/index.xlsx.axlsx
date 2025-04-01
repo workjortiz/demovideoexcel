@@ -1,0 +1,5 @@
+wb = xlsx_package.workbook
+wb.add_worksheet(name: "Template Carga") do |sheet|
+    my_style = sheet.styles.add_style(b: true, bg_color: "CCC")
+    sheet.add_row ["DESCRIPCION","COLOR","PUERTAS"], :style => my_style
+end

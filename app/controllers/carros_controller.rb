@@ -4,6 +4,10 @@ class CarrosController < ApplicationController
   # GET /carros or /carros.json
   def index
     @carros = Carro.all
+    respond_to do |format|
+      format.html
+      format.xlsx
+    end
   end
 
   # GET /carros/1 or /carros/1.json
