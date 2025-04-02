@@ -6,6 +6,12 @@
 
 <%= link_to "Descarga Template", carros_path(format: "xlsx") %>
 
+<%= form_with(url: importar_carros_path, local: true, multipart:true) do |form| %>
+  <%= form.file_field :file %>
+  <%= form.submit "Importar" %>
+<% end %>
+
+
 <div id="carros">
   <% @carros.each do |carro| %>
     <%= render carro %>

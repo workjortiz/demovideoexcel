@@ -10,6 +10,15 @@ class CarrosController < ApplicationController
     end
   end
 
+  def importar
+    if params[:file].present?
+      ImportadorExcel.new(params[:file]).importar
+      redirect_to carros_path, notice: "Archivo subido"
+    else
+      redirect_to carros_path, alert: "No hay archivo adjunto"
+    end
+  end
+
   # GET /carros/1 or /carros/1.json
   def show
   end
