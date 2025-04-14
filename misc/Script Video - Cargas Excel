@@ -1,9 +1,17 @@
-[ARRANCAR CON .ruby_version y GEMFILE]
+[PRE-REQUISITOS]
+- ARRANCAR VISUAL CODE CON .ruby_version y GEMFILE 
+- TERMINAL con directorio ubicado
+- Navegador Chrome con Bookmark oculto
+- Rollback migration
+- Cerrar directorio en el visual code
+- Tener cerrado todo lo de excel
+- Abrir rama con proyecto elaborado en la parte del servicio
+- Ubicar Excel de importar en una carpeta vacia
+' Tener listo DBeaver con Script
 
 Para Importar Información del excel usaremos ROO y ACTIVERECORD-IMPORT y para crear un Template para la importación usaremos CAXLSX 
 
 Arrancaremos con un proyecto ya creado, aca estoy usando Ruby 3.2.4 junto Rails 7.2.2.
-
 
 Lo primero que haremos sera adicionar las gemas  a utilizar en el archvivo Gemfile
 
@@ -15,25 +23,23 @@ Para generar el template colocaremos
 gem "caxlsx", "4.2.0"
 gem "caxlsx_rails", "0.6.4"
 
-Y procedemos a hacer Bundle install.
+Y procedemos a hacer 
+>> bundle install.
 
-Para este ejecicio vamos a crear un modelo llamado Carros, nuestro objeto tendra los siguientes atributos, descripcion, color y puertas.
+Para este ejercicio vamos a crear un modelo llamado Carro, nuestro objeto carro tendra los siguientes atributos: tipo, color y puertas.
 
 Entonces elaboramos el respectivo Scaffold 
-rails g scaffold Carro descripcion:string color:string puertas:integer
+>> rails g scaffold Carro tipo:string color:string puertas:integer
 
-Y tambien ejecutamos la respectiva migracion
-rake db:migrate
+completo el Scaffold ejecutamos la respectiva migracion
+>> rake db:migrate
 
-levantamos nuevamente nuestro ambiente y accedemos a la URL de nuestro nuevo objeto
+levantamos nuevamente nuestro ambiente y accedemos a la URL de nuestro nuevo objeto y creamos rapidamente un ejemplo
+>> rails s
 
-Vamos a crear rapidamente un ejemplo
+Como siguiente paso generaremos el template para subir datos. Haciendo uso de la gema caxlsx_rails nos permitira diseñar el template sacando la logica del controlador y llevandola a modo de vista.
 
-Ahora para nuestro demo como primera parte haremos el proceso para generar el template.
-
-Haciendo uso de la gema complementaria caxlsx_rails nos permitira diseñar la estructura del template sacando la logica del controlador y llevandola a modo de vista.
-
-Para ello iremos al directorio donde se ubica el folder de vistas de este modelo y crearemos una nueva vista con el nombre
+Entonces en el directorio donde se ubica el folder de vistas de nuestro objeto crearemos una nueva vista con el nombre
 
 <<index.xlsx.axlsx>>
 
@@ -46,7 +52,7 @@ wb.add_worksheet(name: "Clients") do |sheet|
 end
 
 
-Luego en la vista index html colocaremos un boton para obtener este template que diseñamos. Para ello colocaremos como ruta el mismo index pero con formato xlsx.
+Luego en la vista index html de nuestro objeto colocaremos un boton para obtener este template que diseñamos. Para ello colocaremos como ruta el mismo index pero con formato xlsx.
 
 
 <%= link_to "Descarga Template", carros_path(format: "xlsx") %>
@@ -60,13 +66,15 @@ Por ultimo, en el controlador de nuestro objeto, en su metodo index haremos una 
 
 <<TESTEAR>>
 
-Con esto terminamos la primera parte, segunda parte importar datos usando este excel.
+Con esto terminamos el generar la plantilla, como siguiente paso usaremos esta plantilla para importar.
 
 Vamos a llenar el excel con algunos registros
 
-Para el proceso de importación crearemos un servicio. Para ello habilitaremos una carpeta llamada services y crearemos un archivo llamado importador_excel.rb
+Para el proceso de importación crearemos un servicio. Para ello habilitaremos una carpeta llamada services dentro de la carpeta "APP" del proyecto y crearemos un archivo llamado importador_excel.rb
 
-Dentro de este archivo lo primero sera importar la libreria "roo"
+Dentro de este archivo lo primero sera importar la libreria 
+
+require "roo"
 
 Luego colocaremos la clase y dentro un inicializador, en este inicializador instanciaremos el archivo que subiremos mas adelante 
 
@@ -94,7 +102,7 @@ carro.save
 
 Como siguiente paso, debemos habilitar la forma de subir nuestro archivo en la vista del index.
 
-Para realizar la acción de importar  necesitamos de un formulario de carga, para ello añadiremos:
+Para realizar la acción de importar  necesitamos de un formulario de carga añadiendo en el index:
 
 <%= form_with(url: importar_carros_path, local: true, multipart:true) do |form| %>
   <%= form.file_field :file %>
@@ -102,7 +110,7 @@ Para realizar la acción de importar  necesitamos de un formulario de carga, par
 <% end %>
 
 
-Debemos habilitar una routa a un metodo en el controlador que accione el servicio que creamos. Dentro del archivos routes, habilitaremos una colección dentro del objeto carros que creamos
+Debemos habilitar una ruta a un metodo en el controlador que accione el servicio que creamos. Dentro del archivos routes, habilitaremos una colección dentro del objeto carros que creamos
 
 
   resources :carros do 
