@@ -1,0 +1,131 @@
+[ARRANCAR CON .ruby_version y GEMFILE]
+
+Para Importar Información del excel usaremos ROO y ACTIVERECORD-IMPORT y para crear un Template para la importación usaremos CAXLSX 
+
+Arrancaremos con un proyecto ya creado, aca estoy usando Ruby 3.2.4 junto Rails 7.2.2.
+
+
+Lo primero que haremos sera adicionar las gemas  a utilizar en el archvivo Gemfile
+
+Para Importar utilizaremos colocaremos
+gem "roo", "2.10.1"
+gem "activerecord-import", "2.0.0"
+
+Para generar el template colocaremos
+gem "caxlsx", "4.2.0"
+gem "caxlsx_rails", "0.6.4"
+
+Y procedemos a hacer Bundle install.
+
+Para este ejecicio vamos a crear un modelo llamado Carros, nuestro objeto tendra los siguientes atributos, descripcion, color y puertas.
+
+Entonces elaboramos el respectivo Scaffold 
+rails g scaffold Carro descripcion:string color:string puertas:integer
+
+Y tambien ejecutamos la respectiva migracion
+rake db:migrate
+
+levantamos nuevamente nuestro ambiente y accedemos a la URL de nuestro nuevo objeto
+
+Vamos a crear rapidamente un ejemplo
+
+Ahora para nuestro demo como primera parte haremos el proceso para generar el template.
+
+Haciendo uso de la gema complementaria caxlsx_rails nos permitira diseñar la estructura del template sacando la logica del controlador y llevandola a modo de vista.
+
+Para ello iremos al directorio donde se ubica el folder de vistas de este modelo y crearemos una nueva vista con el nombre
+
+<<index.xlsx.axlsx>>
+
+Dentro del archivo colocamos
+
+wb = xlsx_package.workbook
+wb.add_worksheet(name: "Clients") do |sheet|
+    my_style = sheet.styles.add_style(b: true, bg_color: "FFCC33", fg_color: "000000")
+    sheet.add_row ["Fiscal Name","Comercial Name", "Fiscal Address", "Comercial Address", "Country", "Tax Rule" ,"Currency"], :style => my_style
+end
+
+
+Luego en la vista index html colocaremos un boton para obtener este template que diseñamos. Para ello colocaremos como ruta el mismo index pero con formato xlsx.
+
+
+<%= link_to "Descarga Template", carros_path(format: "xlsx") %>
+
+Por ultimo, en el controlador de nuestro objeto, en su metodo index haremos una sobreescritura de sus formatos de retorno, colocaremos que permita responder en el formato xlsx junto al formato html.
+
+    respond_to do |format|
+      format.html
+      format.xlsx
+    end
+
+<<TESTEAR>>
+
+Con esto terminamos la primera parte, segunda parte importar datos usando este excel.
+
+Vamos a llenar el excel con algunos registros
+
+Para el proceso de importación crearemos un servicio. Para ello habilitaremos una carpeta llamada services y crearemos un archivo llamado importador_excel.rb
+
+Dentro de este archivo lo primero sera importar la libreria "roo"
+
+Luego colocaremos la clase y dentro un inicializador, en este inicializador instanciaremos el archivo que subiremos mas adelante 
+
+Siguiente paso es añadir un metodo donde ubicaremos la logica del parseo del excel. Le llamaremos importar.
+
+Ahora empezaremos a hacer uso de la libreria Roo, para ello colocaremos 
+
+ hoja = Roo::Spreadsheet.open(@file.path)
+
+Dado que la cabecera esta en la primera fila, haremos un ciclo de la segunda fila hasta la ultima con registro
+
+(2..hoja.last_row).each do |fila|
+
+Y en cada vuelta del ciclo ubicaremos la información de cada fila en una variable
+
+datos_filas = hoja.row(fila)
+
+Ya por ultimo podemos acceder columna por columna en la posición fijada de cada atributo y grabar un objeto nuevo.
+
+carro = Carro.new
+carro.descripcion = datos_filas[0]
+carro.color = datos_filas[1]
+carro.puertas = datos_filas[2]
+carro.save
+
+Como siguiente paso, debemos habilitar la forma de subir nuestro archivo en la vista del index.
+
+Para realizar la acción de importar  necesitamos de un formulario de carga, para ello añadiremos:
+
+<%= form_with(url: importar_carros_path, local: true, multipart:true) do |form| %>
+  <%= form.file_field :file %>
+  <%= form.submit "Importar" %>
+<% end %>
+
+
+Debemos habilitar una routa a un metodo en el controlador que accione el servicio que creamos. Dentro del archivos routes, habilitaremos una colección dentro del objeto carros que creamos
+
+
+  resources :carros do 
+    collection {
+      post :importar
+    }
+  end
+
+Por ultimo en el controlador añadimos el metodo de la ruta con el llamado al servicio
+
+  def importar
+    if params[:file].present?
+      ImportadorExcel.new(params[:file]).importar
+      redirect_to carros_path, notice: "Archivo subido"
+    else
+      redirect_to carros_path, alert: "No hay archivo adjunto"
+    end
+  end
+
+ reiniciamos el servicio y probamos
+
+ 
+
+
+
+
