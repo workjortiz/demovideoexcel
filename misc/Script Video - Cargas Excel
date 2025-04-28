@@ -3,11 +3,13 @@
 - TERMINAL con directorio ubicado
 - Navegador Chrome con Bookmark oculto
 - Rollback migration
-- Cerrar directorio en el visual code
+- Cerrar migajas y panel directorio en el visual code
 - Tener cerrado todo lo de excel
-- Abrir rama con proyecto elaborado en la parte del servicio
+- Checkout rama con proyecto con punto limpio
 - Ubicar Excel de importar en una carpeta vacia
-' Tener listo DBeaver con Script
+- Tener listo DBeaver con Script y cerrrar todos los otros scripts y panel directorio
+- Hacerle zoom a la terminal
+
 
 Para Importar Información del excel usaremos ROO y ACTIVERECORD-IMPORT y para crear un Template para la importación usaremos CAXLSX 
 
@@ -46,9 +48,9 @@ Entonces en el directorio donde se ubica el folder de vistas de nuestro objeto c
 Dentro del archivo colocamos
 
 wb = xlsx_package.workbook
-wb.add_worksheet(name: "Clients") do |sheet|
-    my_style = sheet.styles.add_style(b: true, bg_color: "FFCC33", fg_color: "000000")
-    sheet.add_row ["Fiscal Name","Comercial Name", "Fiscal Address", "Comercial Address", "Country", "Tax Rule" ,"Currency"], :style => my_style
+wb.add_worksheet(name: "Clients") do |hoja|
+    mi_estilo = hoja.styles.add_style(b: true, bg_color: "FFCC33", fg_color: "000000")
+    hoja.add_row ["Fiscal Name","Comercial Name", "Fiscal Address", "Comercial Address", "Country", "Tax Rule" ,"Currency"], :style => mi_estilo
 end
 
 
